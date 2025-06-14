@@ -24,8 +24,12 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'unsafe-default-secret-key')
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True' if not RENDER else False
 
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+
 if RENDER:
-    ALLOWED_HOSTS.append('.onrender.com')
+    ALLOWED_HOSTS += [
+        'backend-7x8e.onrender.com',
+        'frontend-chi-gold-71.vercel.app',
+    ]
 
 # --------------------------------------------------
 # APPLICATIONS
@@ -139,7 +143,6 @@ else:
     STATIC_URL = '/static/'
     STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-    # ✅ Fix: Ensure static directory exists or comment it if not needed
     static_dir = BASE_DIR / 'static'
     if static_dir.exists():
         STATICFILES_DIRS = [static_dir]
@@ -167,10 +170,11 @@ SIMPLE_JWT = {
 # --------------------------------------------------
 # CORS HEADERS
 # --------------------------------------------------
-CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://localhost:5173'
-).split(',')
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://frontend-chi-gold-71.vercel.app",
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
