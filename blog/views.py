@@ -1,10 +1,10 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-from rest_framework.response import Response
-from rest_framework import status
 from django.http import JsonResponse
 
 from .models import Blog
@@ -16,10 +16,10 @@ class BlogViewSet(viewsets.ModelViewSet):
     serializer_class = BlogSerializer
 
 
-class RegisterView(viewsets.ViewSet):
+class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    def create(self, request):
+    def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = User.objects.create(
