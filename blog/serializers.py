@@ -5,13 +5,12 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Blog
 
-# Serializer for Blog model
 class BlogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
         fields = '__all__'
+        read_only_fields = ['author']  # 👈 Prevent author from being passed by frontend
 
-# Serializer for user registration
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
@@ -27,13 +26,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-# Custom Token serializer (used in MyTokenObtainPairView)
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-
-        # Add custom claims if needed
         token['username'] = user.username
         token['email'] = user.email
         return token
