@@ -18,9 +18,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 # SECURITY SETTINGS
 # --------------------------------------------------
+RENDER = os.getenv('RENDER') is not None
+
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'unsafe-default-secret-key')
-DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True' if not RENDER else False
+
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+if RENDER:
+    ALLOWED_HOSTS.append('.onrender.com')
 
 # --------------------------------------------------
 # APPLICATIONS
@@ -81,7 +86,7 @@ TEMPLATES = [
 ]
 
 # --------------------------------------------------
-# DATABASE (Railway via DATABASE_URL)
+# DATABASE
 # --------------------------------------------------
 DATABASES = {
     'default': dj_database_url.parse(
@@ -109,7 +114,7 @@ USE_I18N = True
 USE_TZ = True
 
 # --------------------------------------------------
-# STATIC & MEDIA FILES (S3 if configured)
+# STATIC & MEDIA FILES
 # --------------------------------------------------
 USE_S3 = os.getenv('USE_S3', 'False') == 'True'
 
@@ -134,6 +139,11 @@ else:
     STATIC_URL = '/static/'
     STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+    # ✅ Fix: Ensure static directory exists or comment it if not needed
+    static_dir = BASE_DIR / 'static'
+    if static_dir.exists():
+        STATICFILES_DIRS = [static_dir]
+    
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -178,6 +188,11 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+# --------------------------------------------------
+# RENDER - PROXY HTTPS
+# --------------------------------------------------
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # --------------------------------------------------
 # DEFAULT FIELD
