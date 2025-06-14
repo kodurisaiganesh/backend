@@ -1,3 +1,5 @@
+# settings.py
+
 import os
 from pathlib import Path
 from datetime import timedelta
@@ -28,6 +30,7 @@ if RENDER:
         'backend-7x8e.onrender.com',
         'frontend-chi-gold-71.vercel.app',
         'frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app',
+        'frontend-dxluvi8pe-koduri-sai-ganeshs-projects.vercel.app',  # ✅ New frontend added
     ]
 
 # --------------------------------------------------
@@ -173,6 +176,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://frontend-chi-gold-71.vercel.app",
     "https://frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app",
+    "https://frontend-dxluvi8pe-koduri-sai-ganeshs-projects.vercel.app",  # ✅ Add your new deployed frontend here
 ]
 
 CORS_ALLOW_CREDENTIALS = True
