@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Blog
 from .serializers import BlogSerializer
 from .tokens import MyTokenObtainPairSerializer  # custom serializer
+from django.http import JsonResponse  # NEW
 
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all().order_by('-created_at')
@@ -28,3 +29,7 @@ class BlogViewSet(viewsets.ModelViewSet):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
+# NEW: Health check view
+def health_check(request):
+    return JsonResponse({"status": "Backend is running ✅"})
