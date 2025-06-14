@@ -2,11 +2,16 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
+import dj_database_url
+import pymysql
 
 # --------------------------------------------------
 # LOAD ENVIRONMENT VARIABLES
 # --------------------------------------------------
 load_dotenv()
+
+# MySQLdb compatibility using PyMySQL
+pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,20 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'unsafe-default-secret-key')
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
-
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 # --------------------------------------------------
 # APPLICATIONS
 # --------------------------------------------------
 INSTALLED_APPS = [
-    # Third-party
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'storages',
 
-    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -36,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Local apps
     'blog',
 ]
 
@@ -80,17 +81,13 @@ TEMPLATES = [
 ]
 
 # --------------------------------------------------
-# DATABASE (MySQL via Amazon RDS or local)
+# DATABASE (Railway via DATABASE_URL)
 # --------------------------------------------------
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'blog_app'),
-        'USER': os.getenv('MYSQL_USER', 'blog_user'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'password123'),
-        'HOST': os.getenv('MYSQL_HOST', 'localhost'),
-        'PORT': os.getenv('MYSQL_PORT', '3306'),
-    }
+    'default': dj_database_url.parse(
+        os.getenv("DATABASE_URL", "mysql://user:pass@localhost:3306/dbname"),
+        conn_max_age=600
+    )
 }
 
 # --------------------------------------------------
