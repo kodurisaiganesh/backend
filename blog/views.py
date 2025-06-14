@@ -1,39 +1,27 @@
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.exceptions import PermissionDenied
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.http import JsonResponse
-
 from .models import Blog
-from .serializers import BlogSerializer, RegisterSerializer
-from .tokens import MyTokenObtainPairSerializer
-from django.contrib.auth.models import User
+from .serializers import BlogSerializer, RegisterSerializer, MyTokenObtainPairSerializer
 
-class BlogViewSet(viewsets.ModelViewSet):
-    queryset = Blog.objects.all().order_by('-created_at')
-    serializer_class = BlogSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+# Health check endpoint
+def health_check(request):
+    return JsonResponse({"status": "Backend is running ✅"})
 
-    def perform_update(self, serializer):
-        blog = self.get_object()
-        if blog.author != self.request.user:
-            raise PermissionDenied("Only the author can edit this blog.")
-        serializer.save()
 
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise PermissionDenied("Only the author can delete this blog.")
-        instance.delete()
-
+# Custom Token view (if needed)
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+
+# ✅ Register view allowing unauthenticated access
 class RegisterView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -41,5 +29,19 @@ class RegisterView(APIView):
             return Response({'message': 'User registered successfully!'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def health_check(request):
-    return JsonResponse({"status": "Backend is running ✅"})
+
+# Blog view for authenticated users
+class BlogListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        blogs = Blog.objects.all()
+        serializer = BlogSerializer(blogs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = BlogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(author=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
