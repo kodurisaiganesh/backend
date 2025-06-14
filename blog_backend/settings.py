@@ -5,18 +5,16 @@ from dotenv import load_dotenv
 import dj_database_url
 import pymysql
 
-# --------------------------------------------------
-# LOAD ENVIRONMENT VARIABLES
-# --------------------------------------------------
+# Load .env
 load_dotenv()
 
-# MySQLdb compatibility using PyMySQL
+# MySQL compatibility
 pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --------------------------------------------------
-# SECURITY SETTINGS
+# SECURITY
 # --------------------------------------------------
 RENDER = os.getenv('RENDER') is not None
 
@@ -29,6 +27,7 @@ if RENDER:
     ALLOWED_HOSTS += [
         'backend-7x8e.onrender.com',
         'frontend-chi-gold-71.vercel.app',
+        'frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app',
     ]
 
 # --------------------------------------------------
@@ -54,7 +53,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # --------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Must be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -142,11 +141,10 @@ if USE_S3:
 else:
     STATIC_URL = '/static/'
     STATIC_ROOT = BASE_DIR / 'staticfiles'
-
     static_dir = BASE_DIR / 'static'
     if static_dir.exists():
         STATICFILES_DIRS = [static_dir]
-    
+
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -168,12 +166,13 @@ SIMPLE_JWT = {
 }
 
 # --------------------------------------------------
-# CORS HEADERS
+# CORS SETTINGS
 # --------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
     "https://frontend-chi-gold-71.vercel.app",
+    "https://frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -194,7 +193,7 @@ LOGGING = {
 }
 
 # --------------------------------------------------
-# RENDER - PROXY HTTPS
+# RENDER HTTPS
 # --------------------------------------------------
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
