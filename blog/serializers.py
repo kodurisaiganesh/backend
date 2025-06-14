@@ -1,31 +1,39 @@
+# blog/serializers.py
+
 from rest_framework import serializers
-from .models import Blog
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import Blog
 
-
+# Serializer for Blog model
 class BlogSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
-
     class Meta:
         model = Blog
-        fields = ['id', 'title', 'slug', 'content', 'created_at', 'author']
-        read_only_fields = ['id', 'slug', 'created_at', 'author']
+        fields = '__all__'
 
-
+# Serializer for user registration
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {
-            'email': {'required': True},
-        }
+        fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
-            email=validated_data['email'],
+            email=validated_data.get('email', ''),
             password=validated_data['password']
         )
         return user
+
+# Custom Token serializer (used in MyTokenObtainPairView)
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims if needed
+        token['username'] = user.username
+        token['email'] = user.email
+        return token
