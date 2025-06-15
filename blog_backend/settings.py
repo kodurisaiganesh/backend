@@ -4,7 +4,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import dj_database_url
 import pymysql
-from corsheaders.defaults import default_headers  # ✅ Add this import
+from corsheaders.defaults import default_headers
 
 # Load .env
 load_dotenv()
@@ -30,13 +30,14 @@ if RENDER:
         'frontend-chi-gold-71.vercel.app',
         'frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app',
         'frontend-dxluvi8pe-koduri-sai-ganeshs-projects.vercel.app',
+        'frontend-q9g6mjpnl-koduri-sai-ganeshs-projects.vercel.app',  # ✅ Added latest frontend
     ]
 
 # --------------------------------------------------
 # APPLICATIONS
 # --------------------------------------------------
 INSTALLED_APPS = [
-    'corsheaders',  # ✅ For CORS
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'storages',
@@ -55,8 +56,8 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # --------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be first
-    'django.middleware.common.CommonMiddleware',  # ✅ Helps with preflight requests
+    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be before CommonMiddleware
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -176,18 +177,19 @@ CORS_ALLOWED_ORIGINS = [
     "https://frontend-chi-gold-71.vercel.app",
     "https://frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app",
     "https://frontend-dxluvi8pe-koduri-sai-ganeshs-projects.vercel.app",
+    "https://frontend-q9g6mjpnl-koduri-sai-ganeshs-projects.vercel.app",  # ✅ CURRENT one
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'access-control-allow-origin',
-    'authorization',
-    'x-csrftoken',
-    'content-type',
+    "access-control-allow-origin",
+    "authorization",
+    "x-csrftoken",
+    "content-type",
 ]
 
-CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
 
 CORS_ALLOW_METHODS = [
     "DELETE",
