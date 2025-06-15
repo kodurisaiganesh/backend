@@ -1,43 +1,41 @@
-from rest_framework import viewsets, status
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse
-
+from rest_framework import generics, permissions
 from .models import Blog
-from .serializers import BlogSerializer, RegisterSerializer, MyTokenObtainPairSerializer
-from .permissions import IsAuthorOrReadOnly  # ✅ Custom permission
+from .serializers import BlogSerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework import status
 
-class BlogViewSet(viewsets.ModelViewSet):
+class BlogListCreateAPIView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
-    permission_classes = [IsAuthorOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # ✅ Pass request to serializer
+        return context
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+class BlogRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # ✅ Pass request to serializer
+        return context
 
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = User.objects.create(
-                username=serializer.validated_data['username'],
-                email=serializer.validated_data['email'],
-                password=make_password(serializer.validated_data['password'])
-            )
-            return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_update(self, serializer):
+        # Optional: ensure only author can update
+        if self.get_object().author != self.request.user:
+            return Response({'detail': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
+        serializer.save()
 
-
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-
-
-def health_check(request):
-    return JsonResponse({"status": "ok"})
+    def perform_destroy(self, instance):
+        # Optional: ensure only author can delete
+        if instance.author != self.request.user:
+            return Response({'detail': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
+        instance.delete()
