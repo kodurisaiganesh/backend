@@ -11,23 +11,16 @@ from django.http import JsonResponse
 
 from .models import Blog
 from .serializers import BlogSerializer, RegisterSerializer, MyTokenObtainPairSerializer
+from .permissions import IsAuthorOrReadOnly  # ✅ import custom permission
 
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # ✅ Only authenticated users can post
+    permission_classes = [IsAuthorOrReadOnly]  # ✅ use custom permission
 
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-
-            # ✅ Set the author to the logged-in user
-            serializer.save(author=request.user)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        # ✅ Automatically assign the logged-in user as author
+        serializer.save(author=self.request.user)
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
