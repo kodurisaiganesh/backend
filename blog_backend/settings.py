@@ -30,7 +30,8 @@ if RENDER:
         'frontend-chi-gold-71.vercel.app',
         'frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app',
         'frontend-dxluvi8pe-koduri-sai-ganeshs-projects.vercel.app',
-        'frontend-q9g6mjpnl-koduri-sai-ganeshs-projects.vercel.app',  # ✅ Added latest frontend
+        'frontend-q9g6mjpnl-koduri-sai-ganeshs-projects.vercel.app',
+        'frontend-1b2yguaj7-koduri-sai-ganeshs-projects.vercel.app',  # ✅ NEW FRONTEND
     ]
 
 # --------------------------------------------------
@@ -56,7 +57,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # --------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be before CommonMiddleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -177,7 +178,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://frontend-chi-gold-71.vercel.app",
     "https://frontend-v0jro9squ-koduri-sai-ganeshs-projects.vercel.app",
     "https://frontend-dxluvi8pe-koduri-sai-ganeshs-projects.vercel.app",
-    "https://frontend-q9g6mjpnl-koduri-sai-ganeshs-projects.vercel.app",  # ✅ CURRENT one
+    "https://frontend-q9g6mjpnl-koduri-sai-ganeshs-projects.vercel.app",
+    "https://frontend-1b2yguaj7-koduri-sai-ganeshs-projects.vercel.app",  # ✅ NEW FRONTEND
 ]
 
 CORS_ALLOW_CREDENTIALS = True
