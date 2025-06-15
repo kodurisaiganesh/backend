@@ -1,5 +1,3 @@
-# blog/serializers.py
-
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -10,8 +8,11 @@ class BlogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blog
-        fields = '__all__'
-        read_only_fields = ['author']
+        fields = [
+            'id', 'title', 'slug', 'content', 'created_at', 'updated_at',
+            'is_published', 'author', 'author_username'
+        ]
+        read_only_fields = ['author', 'slug', 'created_at', 'updated_at', 'author_username']
 
     def get_author_username(self, obj):
         return obj.author.username
@@ -25,12 +26,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        return User.objects.create_user(
             username=validated_data['username'],
             email=validated_data.get('email', ''),
             password=validated_data['password']
         )
-        return user
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
