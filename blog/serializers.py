@@ -6,10 +6,16 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Blog
 
 class BlogSerializer(serializers.ModelSerializer):
+    author_username = serializers.SerializerMethodField()
+
     class Meta:
         model = Blog
         fields = '__all__'
-        read_only_fields = ['author']  # 👈 Prevent author from being passed by frontend
+        read_only_fields = ['author']
+
+    def get_author_username(self, obj):
+        return obj.author.username
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -25,6 +31,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
